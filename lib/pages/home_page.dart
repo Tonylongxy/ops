@@ -6,6 +6,7 @@ import '../core/routes/routes.dart';
 import '../core/session/app_session.dart';
 import '../models/login_response.dart';
 import '../models/product_search_response.dart';
+import 'product_detail_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -230,7 +231,10 @@ class _HomePageState extends State<HomePage> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final product = _products[index];
-            return _ProductCard(product: product);
+            return _ProductCard(
+              product: product,
+              onTap: () => _onProductTap(product),
+            );
           },
           childCount: _products.length,
         ),
@@ -403,105 +407,124 @@ class _HomePageState extends State<HomePage> {
     _searchController.text = keyword;
     _performSearch(keyword);
   }
+
+  void _onProductTap(SearchProductVo product) {
+    Navigator.of(context).pushNamed(
+      AppRoutes.productDetail,
+      arguments: ProductDetailPageArgs(
+        productId: product.id,
+        previewName: product.name,
+        previewImage: product.mainPic,
+      ),
+    );
+  }
 }
 
 class _ProductCard extends StatelessWidget {
-  const _ProductCard({required this.product});
+  const _ProductCard({required this.product, this.onTap});
 
   final SearchProductVo product;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: product.mainPic.isNotEmpty
-                    ? Image.network(
-                        product.mainPic,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            _PlaceholderImage(title: product.name),
-                      )
-                    : _PlaceholderImage(title: product.name),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AspectRatio(
+                aspectRatio: 1,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: product.mainPic.isNotEmpty
+                      ? Image.network(
+                          product.mainPic,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _PlaceholderImage(title: product.name),
+                        )
+                      : _PlaceholderImage(title: product.name),
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.spec.isNotEmpty ? product.spec : '规格参数待完善',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.orange,
-                      fontSize: 12,
-                    ),
-                  ),
-                  const Spacer(),
-                  Row(
-                    children: [
-                      Text(
-                        '¥${product.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: Color(0xFF09AA43),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
-                      const Spacer(),
-                      SizedBox(
-                        width: 32,
-                        height: 32,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          iconSize: 20,
-                          onPressed: () {},
-                          icon: Icon(
-                            product.isFavorited ? Icons.star : Icons.star_border,
-                            color: product.isFavorited
-                                ? const Color(0xFF09AA43)
-                                : Colors.grey,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      product.spec.isNotEmpty ? product.spec : '规格参数待完善',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Text(
+                          '¥${product.price.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Color(0xFF09AA43),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: const Size(32, 32),
-                          shape: const CircleBorder(),
-                          backgroundColor: const Color(0xFF09AA43),
+                        const Spacer(),
+                        SizedBox(
+                          width: 32,
+                          height: 32,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 20,
+                            onPressed: () {},
+                            icon: Icon(
+                              product.isFavorited
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              color: product.isFavorited
+                                  ? const Color(0xFF09AA43)
+                                  : Colors.grey,
+                            ),
+                          ),
                         ),
-                        onPressed: () {},
-                        child: const Icon(Icons.add, color: Colors.white, size: 18),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 4),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(32, 32),
+                            shape: const CircleBorder(),
+                            backgroundColor: const Color(0xFF09AA43),
+                          ),
+                          onPressed: () {},
+                          child:
+                              const Icon(Icons.add, color: Colors.white, size: 18),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

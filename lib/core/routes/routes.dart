@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../pages/home_page.dart';
 import '../../pages/login_page.dart';
 import '../../pages/my_page.dart';
+import '../../pages/product_detail_page.dart';
 
 /// 路由名称常量
 class AppRoutes {
@@ -17,6 +18,9 @@ class AppRoutes {
 
   /// 我的
   static const String my = '/my';
+
+  /// 商品详情
+  static const String productDetail = '/product/detail';
 }
 
 /// 路由生成器
@@ -41,6 +45,13 @@ class RouteGenerator {
       case AppRoutes.my:
         return _buildRoute(
           const MyPage(),
+          settings: settings,
+        );
+
+      case AppRoutes.productDetail:
+        final detailArgs = ProductDetailPageArgs.from(args);
+        return _buildRoute(
+          ProductDetailPage(args: detailArgs),
           settings: settings,
         );
 
