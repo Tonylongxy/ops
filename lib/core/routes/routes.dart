@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../pages/home_page.dart';
 import '../../pages/login_page.dart';
+import '../../pages/my_page.dart';
 
 /// 路由名称常量
 class AppRoutes {
@@ -13,6 +14,9 @@ class AppRoutes {
 
   /// 首页
   static const String home = '/home';
+
+  /// 我的
+  static const String my = '/my';
 }
 
 /// 路由生成器
@@ -31,6 +35,12 @@ class RouteGenerator {
       case AppRoutes.home:
         return _buildRoute(
           const HomePage(),
+          settings: settings,
+        );
+
+      case AppRoutes.my:
+        return _buildRoute(
+          const MyPage(),
           settings: settings,
         );
 

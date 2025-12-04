@@ -1,8 +1,8 @@
 import 'package:characters/characters.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../core/network/api_client.dart';
+import '../core/routes/routes.dart';
 import '../core/session/app_session.dart';
 import '../models/login_response.dart';
 import '../models/product_search_response.dart';
@@ -45,30 +45,53 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Column(
-            children: [
-              _buildSearchHeader(),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () => _fetchProducts(keyword: _searchController.text),
-                  child: CustomScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    slivers: [
-                      _buildProductSliver(),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+        child: IndexedStack(
+          index: _currentIndex,
+          children: [
+            _buildHomeTab(),
+            _buildPlaceholderTab('分类'),
+            _buildPlaceholderTab('购物车'),
+          ],
         ),
       ),
       bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildHomeTab() {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Column(
+        children: [
+          _buildSearchHeader(),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => _fetchProducts(keyword: _searchController.text),
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: [
+                  _buildProductSliver(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderTab(String title) {
+    return Center(
+      child: Text(
+        '$title功能开发中',
+        style: const TextStyle(
+          color: Colors.grey,
+          fontSize: 16,
+        ),
+      ),
     );
   }
 
@@ -218,7 +241,13 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBottomNav() {
     return BottomNavigationBar(
       currentIndex: _currentIndex,
-      onTap: (index) => setState(() => _currentIndex = index),
+      onTap: (index) {
+        if (index == 3) {
+          Navigator.of(context).pushNamed(AppRoutes.my);
+          return;
+        }
+        setState(() => _currentIndex = index);
+      },
       selectedItemColor: const Color(0xFF09AA43),
       unselectedItemColor: Colors.grey,
       items: const [
